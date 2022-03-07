@@ -10,7 +10,7 @@ import {
 import { marshall } from "@aws-sdk/util-dynamodb";
 import { DynamoDB } from "@aws-sdk/client-dynamodb";
 import * as store from "./store";
-import { Instant, PriceAtInstant } from "./domain.types";
+import { Instant, PriceAtInstant } from "../validation/domain.types";
 
 const dynamoClient = new DynamoDB({
   endpoint: "http://localhost:8008/",

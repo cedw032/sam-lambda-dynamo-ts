@@ -1,8 +1,8 @@
 import { describe, it, expect, beforeEach, afterEach } from "@jest/globals";
 
 import { DynamoDB } from "@aws-sdk/client-dynamodb";
-import * as store from "../../src/store";
-import { Instant, PriceAtInstant } from "../../src/domain.types";
+import * as store from "../../src/store/store";
+import { Instant, PriceAtInstant } from "../../src/validation/domain.types";
 
 const dynamoClient = new DynamoDB({
   endpoint: "http://localhost:8008/",

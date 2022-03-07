@@ -1,7 +1,7 @@
 import { DynamoDB } from "@aws-sdk/client-dynamodb";
 import { marshall, unmarshall } from "@aws-sdk/util-dynamodb";
 
-import { Base, Instant, Price, PriceAtInstant } from "./domain.types";
+import { Base, Instant, Price, PriceAtInstant } from "../validation/domain.types";
 
 const tableName = "Price";
 

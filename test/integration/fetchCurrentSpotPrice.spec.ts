@@ -1,10 +1,10 @@
 import { expect, describe, it, jest, beforeEach } from "@jest/globals";
-import { fetchCurrentSpotPrice } from "../../src/fetchCurrentSpotPrice";
+import { fetchCurrentSpotPrice } from "../../src/external/fetchCurrentSpotPrice";
 import axios from "axios";
 import { DateTime } from "luxon";
 
 describe("fetchCurrentSpotPrice", () => {
-  const now = DateTime.utc(9865);
+  const now = DateTime.fromMillis(9865);
 
   const bases = ["BTC", "ETH"] as const;
 

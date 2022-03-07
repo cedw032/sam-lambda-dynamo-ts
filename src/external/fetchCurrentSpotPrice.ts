@@ -1,7 +1,12 @@
 import axios from "axios";
 import { Static, Number, String, Literal, Union, Record } from "runtypes";
 import { DateTime } from "luxon";
-import { Price, Base, PriceAtInstant, Instant } from "./domain.types";
+import {
+  Price,
+  Base,
+  PriceAtInstant,
+  Instant,
+} from "../validation/domain.types";
 
 export const PriceResponse = Record({
   data: Price,
