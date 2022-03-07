@@ -1,0 +1,112 @@
+AWSTemplateFormatVersion: "2010-09-09"
+Transform: AWS::Serverless-2016-10-31
+Description: >
+  sam-lambda-dynamo-ts
+
+  Sample app showing off SAM
+
+Globals:
+  Function:
+    Timeout: 3
+
+Resources:
+  PriceTable:
+    Type: AWS::DynamoDB::Table
+    Properties:
+      TableName: Price
+      AttributeDefinitions:
+        - AttributeName: base_
+          AttributeType: S
+        - AttributeName: instant
+          AttributeType: N
+      KeySchema:
+        - AttributeName: base_
+          KeyType: HASH
+        - AttributeName: instant
+          KeyType: RANGE
+      ProvisionedThroughput:
+        ReadCapacityUnits: 1
+        WriteCapacityUnits: 1
+  GetPricesFunction:
+    Type: AWS::Serverless::Function
+    Properties:
+      CodeUri: api
+      Handler: index.getPricesForCurrentPeriod
+      Runtime: nodejs14.x
+      Policies:
+        DynamoDBCrudPolicy:
+          TableName: Price
+      Architectures:
+        - x86_64
+      Events:
+        GetPrices:
+          Type: Api
+          Properties:
+            Path: /asset/{asset}/price_changes
+            Method: get
+            RequestParameters:
+              - method.request.querystring.period:
+                  Required: true
+    Metadata:
+      BuildMethod: esbuild
+      BuildProperties:
+        Minify: true
+        Target: "es2020"
+        Sourcemap: true
+        EntryPoints:
+          - src/index.ts
+  FetchEthereumPriceFunction:
+    Type: AWS::Serverless::Function
+    Properties:
+      CodeUri: api
+      Handler: index.fetchEthereumPrice
+      Runtime: nodejs14.x
+      Policies:
+        DynamoDBCrudPolicy:
+          TableName: Price
+      Architectures:
+        - x86_64
+      Events:
+        FetchEthereumPrice:
+          Type: Schedule
+          Properties:
+            Description: Run every five minutes
+            Schedule: rate(5 minutes)
+    Metadata:
+      BuildMethod: esbuild
+      BuildProperties:
+        Minify: true
+        Target: "es2020"
+        Sourcemap: true
+        EntryPoints:
+          - src/index.ts
+  FetchBitcoinPriceFunction:
+    Type: AWS::Serverless::Function
+    Properties:
+      CodeUri: api
+      Handler: index.fetchBitcoinPrice
+      Runtime: nodejs14.x
+      Policies:
+        DynamoDBCrudPolicy:
+          TableName: Price
+      Architectures:
+        - x86_64
+      Events:
+        FetchBitcoinPrice:
+          Type: Schedule
+          Properties:
+            Description: Run every five minutes
+            Schedule: rate(5 minutes)
+    Metadata:
+      BuildMethod: esbuild
+      BuildProperties:
+        Minify: true
+        Target: "es2020"
+        Sourcemap: true
+        EntryPoints:
+          - src/index.ts
+
+Outputs:
+  HelloWorldApi:
+    Description: "API Gateway endpoint URL for Prod"
+    Value: !Sub "https://${ServerlessRestApi}.execute-api.${AWS::Region}.amazonaws.com/Prod/asset/{asset}/price_changes"

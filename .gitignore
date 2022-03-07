@@ -1,2 +1,4 @@
-node_modules/
-coverage/
+.DS_Store
+api/node_modules/
+api/coverage/
+.aws-sam/
