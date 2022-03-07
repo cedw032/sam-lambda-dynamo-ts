@@ -4,16 +4,7 @@ import { Instant } from "../validation/domain.types";
 import { periodToUtcRange } from "./period";
 
 describe("periodToUtcRange", () => {
-  const currentYear = 2012;
-  const currentMonth = 7;
-  const currentDate = 21;
-  const currentHour = 19;
-  const currentMinute = 37;
-  const now = DateTime.utc(currentYear, currentMonth, currentDate, currentHour)
-    .plus({
-      minute: currentMinute,
-    })
-    .valueOf() as Instant;
+  const now = DateTime.utc(2012, 7, 21, 19, 37).valueOf() as Instant;
 
   describe("for period today", () => {
     it("ends at the top of the last hour", () => {
@@ -65,7 +56,7 @@ describe("periodToUtcRange", () => {
   });
 
   describe("for period year", () => {
-    it("ends at the last start of week", () => {
+    it("ends at the start of last monday", () => {
       const result = periodToUtcRange(now, "year");
       expect(DateTime.fromMillis(result.end).toUTC().toISO()).toBe(
         "2012-07-16T00:00:00.000Z"

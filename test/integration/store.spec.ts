@@ -1,7 +1,7 @@
 import { describe, it, expect, beforeEach, afterEach } from "@jest/globals";
 
 import { DynamoDB } from "@aws-sdk/client-dynamodb";
-import * as store from "../../src/store/store";
+import { putPrice, getPrices } from "../../src/store/store";
 import { Instant, PriceAtInstant } from "../../src/validation/domain.types";
 
 const dynamoClient = new DynamoDB({
@@ -13,12 +13,9 @@ describe("store", () => {
   beforeEach(setup);
   afterEach(teardown);
 
-  const putPrice = store.putPrice(dynamoClient);
-  const getPrices = store.getPrices(dynamoClient);
-
   describe("putPrice", () => {
     it("does not return an error", async () => {
-      const result = await putPrice({
+      const result = await putPrice(dynamoClient, {
         base: "BTC",
         currency: "AUD",
         amount: "345.54",
@@ -67,16 +64,16 @@ describe("store", () => {
     } as PriceAtInstant;
 
     beforeEach(async () => {
-      await putPrice(priceBeforeStartBoundary);
-      await putPrice(expectedPrice);
-      await putPrice(priceAfterEndBoundary);
-      await putPrice(priceOfDifferentBase);
+      await putPrice(dynamoClient, priceBeforeStartBoundary);
+      await putPrice(dynamoClient, expectedPrice);
+      await putPrice(dynamoClient, priceAfterEndBoundary);
+      await putPrice(dynamoClient, priceOfDifferentBase);
     });
     it("does not return an error", async () => {
-      expect(getPrices(constraints) instanceof Error).toBe(false);
+      expect(getPrices(dynamoClient, constraints) instanceof Error).toBe(false);
     });
     it("does not return prices with an instant equal to the starting boundary", async () => {
-      const result = await getPrices(constraints);
+      const result = await getPrices(dynamoClient, constraints);
       if (result instanceof Error) {
         throw new Error("result cannot be error");
       }
@@ -85,7 +82,7 @@ describe("store", () => {
       );
     });
     it("does not return prices with an instant equal to the ending boundary", async () => {
-      const result = await getPrices(constraints);
+      const result = await getPrices(dynamoClient, constraints);
       if (result instanceof Error) {
         throw new Error("result cannot be error");
       }
@@ -94,7 +91,7 @@ describe("store", () => {
       );
     });
     it("does not return prices of a different base", async () => {
-      const result = await getPrices(constraints);
+      const result = await getPrices(dynamoClient, constraints);
       if (result instanceof Error) {
         throw new Error("result cannot be error");
       }
@@ -103,7 +100,7 @@ describe("store", () => {
       );
     });
     it("does return prices that meet constraints", async () => {
-      const result = await getPrices(constraints);
+      const result = await getPrices(dynamoClient, constraints);
       if (result instanceof Error) {
         throw new Error("result cannot be error");
       }

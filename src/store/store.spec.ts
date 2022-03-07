@@ -9,7 +9,7 @@ import {
 
 import { marshall } from "@aws-sdk/util-dynamodb";
 import { DynamoDB } from "@aws-sdk/client-dynamodb";
-import * as store from "./store";
+import { putPrice, getPrices } from "./store";
 import { Instant, PriceAtInstant } from "../validation/domain.types";
 
 const dynamoClient = new DynamoDB({
@@ -21,9 +21,6 @@ describe("store", () => {
   const putItem = jest.spyOn(dynamoClient, "putItem");
   const query = jest.spyOn(dynamoClient, "query");
   const error = jest.spyOn(console, "error").mockImplementation(() => {});
-
-  const putPrice = store.putPrice(dynamoClient);
-  const getPrices = store.getPrices(dynamoClient);
 
   const price = {
     base: "BTC",
@@ -49,11 +46,11 @@ describe("store", () => {
         });
       });
       it("calls putItem on client", async () => {
-        await putPrice(price);
+        await putPrice(dynamoClient, price);
         expect(putItem).toBeCalledTimes(1);
       });
       it("returns a promise of void", async () => {
-        const result = await putPrice(price);
+        const result = await putPrice(dynamoClient, price);
         expect(result).toBe(undefined);
       });
     });
@@ -65,11 +62,11 @@ describe("store", () => {
         });
       });
       it("returns an error", async () => {
-        const result = await putPrice(price);
+        const result = await putPrice(dynamoClient, price);
         expect(result instanceof Error).toBe(true);
       });
       it("logs an error", async () => {
-        await putPrice(price);
+        await putPrice(dynamoClient, price);
         expect(error).toBeCalledTimes(1);
       });
     });
@@ -83,11 +80,11 @@ describe("store", () => {
         });
       });
       it("calls putItem on client", async () => {
-        await getPrices(constraints);
+        await getPrices(dynamoClient, constraints);
         expect(query).toBeCalledTimes(1);
       });
       it("returns a promise of prices", async () => {
-        const result = await getPrices(constraints);
+        const result = await getPrices(dynamoClient, constraints);
         expect(result).toStrictEqual([price]);
       });
     });
@@ -99,11 +96,11 @@ describe("store", () => {
         });
       });
       it("calls putItem on client", async () => {
-        await getPrices(constraints);
+        await getPrices(dynamoClient, constraints);
         expect(query).toBeCalledTimes(1);
       });
       it("returns a promise of prices", async () => {
-        const result = await getPrices(constraints);
+        const result = await getPrices(dynamoClient, constraints);
         expect(result).toStrictEqual([]);
       });
     });
@@ -115,11 +112,11 @@ describe("store", () => {
         });
       });
       it("returns an error", async () => {
-        const result = await getPrices(constraints);
+        const result = await getPrices(dynamoClient, constraints);
         expect(result instanceof Error).toBe(true);
       });
       it("logs an error", async () => {
-        await getPrices(constraints);
+        await getPrices(dynamoClient, constraints);
         expect(error).toBeCalledTimes(1);
       });
     });
